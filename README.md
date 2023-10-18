@@ -90,7 +90,7 @@ POST my-index/_doc/_search
 In order to install this plugin, you need to create a zip distribution first by running
 
 ```bash
-gradle clean check
+gradle clean check assemble
 ```
 
 This will produce a zip file in `build/distributions`.
@@ -98,7 +98,7 @@ This will produce a zip file in `build/distributions`.
 After building the zip file, you can install it like this
 
 ```bash
-bin/elasticsearch-plugin install file:///path/to/ingest-h3/build/distributions/ingest-h3-1.0.0-SNAPSHOT.zip
+bin/elasticsearch-plugin install file:///path/to/ingest-h3/build/distributions/ingest-h3-8.10.4.zip
 ```
 
 ## Bugs & TODO
