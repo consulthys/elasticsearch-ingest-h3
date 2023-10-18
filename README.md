@@ -25,7 +25,7 @@ PUT _ingest/pipeline/h3-pipeline
   ]
 }
 
-PUT /my-index/my-type/1?pipeline=h3-pipeline
+PUT /my-index/_doc/1?pipeline=h3-pipeline
 {
   "my_location" : {
     "lat" : "34.03747"
@@ -33,7 +33,7 @@ PUT /my-index/my-type/1?pipeline=h3-pipeline
   }
 }
 
-GET /my-index/my-type/1
+GET /my-index/_doc/1
 {
   "my_location" : {
     "lat" : "34.03747"
@@ -57,6 +57,22 @@ GET /my-index/my-type/1
     "14" : "8e29a199c93268f",
     "15" : "8f29a199c932688"
   }
+}
+```
+
+Since the H3 indexes don't change often (unless the location changes) and there are a finite number of them, indexing them can make sense instead of computing them on the fly on every query.
+A simple `terms` aggregation can then be used to aggregate your geolocated assets at any H3 resolution. 
+```
+POST my-index/_doc/_search
+{
+    "size": 0,
+    "aggs": {
+        "h3": {
+            "terms": {
+                "field": "h3.7"
+            }
+        }
+    }
 }
 ```
 
