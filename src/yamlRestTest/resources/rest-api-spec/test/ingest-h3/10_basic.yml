@@ -1,0 +1,15 @@
+"ingest-h3 plugin installed":
+    - skip:
+          reason: "contains is a newly added assertion"
+          features: contains
+
+    - do:
+        cluster.state: {}
+
+    - set: {master_node: master}
+
+    - do:
+        nodes.info: {}
+
+    - contains:  { 'nodes.$master.plugins': { name: ingest-h3 }  }
+    - contains:  { 'nodes.$master.ingest.processors': { type: h3 } }

@@ -1,0 +1,28 @@
+---
+"Test h3 processor with simulate API":
+  - do:
+      ingest.put_pipeline:
+        id: "my_pipeline"
+        body:  >
+          {
+            "description": "_description",
+            "processors": [
+              {
+                "h3" : {
+                  "field" : "location",
+                  "target_field" : "h3"
+                }
+              }
+            ]
+          }
+  - match: { acknowledged: true }
+
+  - do:
+      ingest.simulate:
+        id: "my_pipeline"
+        body: {docs: [ { _source: { location: {lat: "0.0", lon: "0.0"} } }, { _source: { location: {lat: 0.0, lon: 0.0} } } ] }
+
+  - match: { docs.0.doc._source.h3.0: "8075fffffffffff" }
+  - match: { docs.0.doc._source.h3.15: "8f754e64992d6d8" }
+  - match: { docs.1.doc._source.h3.0: "8075fffffffffff" }
+  - match: { docs.1.doc._source.h3.15: "8f754e64992d6d8" }

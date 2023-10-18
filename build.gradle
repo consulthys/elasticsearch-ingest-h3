@@ -1,0 +1,88 @@
+// Note: Heavily inspired from https://github.com/spinscale/elasticsearch-ingest-langdetect/blob/main/build.gradle
+
+buildscript {
+  repositories {
+    mavenCentral()
+    mavenLocal()
+    jcenter{
+      url "https://jcenter.bintray.com/"
+      metadataSources{
+        artifact()
+      }
+    }
+  }
+
+  dependencies {
+    classpath "org.elasticsearch.gradle:build-tools:${elasticsearchVersion}"
+  }
+}
+
+repositories {
+  mavenCentral()
+  mavenLocal()
+  jcenter{
+    url "https://jcenter.bintray.com/"
+    metadataSources{
+      artifact()
+    }
+  }
+}
+
+group = 'org.elasticsearch.plugin.ingest'
+version = "${elasticsearchVersion}"
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'elasticsearch.esplugin'
+apply plugin: 'elasticsearch.testclusters'
+
+esplugin {
+  name 'ingest-h3'
+  description 'Ingest H3 processor generates Uber H3 indexes for a geo-location field'
+  classname 'com.consulthys.elasticsearch.plugins.ingest.h3.IngestH3Plugin'
+  // license of the plugin, may be different than the above license
+  licenseFile rootProject.file('LICENSE')
+  // copyright notices, may be different than the above notice
+  noticeFile rootProject.file('NOTICE.txt')
+}
+
+// setup yaml rest tests
+testClusters {
+  yamlRestTest
+}
+
+sourceSets {
+  yamlRestTest
+}
+
+configurations {
+  yamlRestTestImplementation.extendsFrom testImplementation
+  yamlRestTestRuntimeOnly.extendsFrom testRuntimeOnly
+  restTestSpecs
+}
+
+// In this section you declare the dependencies for your production and test code
+// Note, the two dependencies are not really needed as the buildscript dependency gets them in already
+// they are just here as an example
+dependencies {
+  implementation 'com.uber:h3:4.1.1'
+
+  // the yaml tests require a log4j2 dependency, otherwise a dependency is thrown on startup
+  //runtimeOnly 'org.apache.logging.log4j:log4j-core:2.17.2'
+  testImplementation "org.elasticsearch.test:framework:${elasticsearchVersion}"
+  restTestSpecs "org.elasticsearch:rest-api-spec:${elasticsearchVersion}"
+}
+
+// Set to false to not use elasticsearch checkstyle rules
+//checkstyleMain.enabled = false
+//checkstyleTest.enabled = false
+//validateNebulaPom.enabled = false
+
+// FIXME dependency license check needs to be enabled
+//dependencyLicenses.enabled = false
+
+// FIXME thirdparty audit needs to be enabled
+//thirdPartyAudit.enabled = false
+
+// Uncomment this to skip license header checks
+//licenseHeaders.enabled = false

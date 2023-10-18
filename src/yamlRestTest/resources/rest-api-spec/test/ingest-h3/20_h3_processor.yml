@@ -1,0 +1,46 @@
+---
+"Test h3 processor with defaults":
+  - do:
+      ingest.put_pipeline:
+        id: "my_pipeline"
+        body:  >
+          {
+            "description": "_description",
+            "processors": [
+              {
+                "h3" : {
+                  "field" : "location",
+                  "target_field" : "h3"
+                }
+              }
+            ]
+          }
+  - match: { acknowledged: true }
+
+  - do:
+      index:
+        index: test
+        id: 1
+        pipeline: "my_pipeline"
+        body: {location: {lat: "0.0", lon: "0.0"}}
+
+  - do:
+      index:
+        index: test
+        id: 2
+        pipeline: "my_pipeline"
+        body: {location: {lat: 0.0, lon: 0.0}}
+
+  - do:
+      get:
+        index: test
+        id: 1
+  - match: { _source.h3.0: "8075fffffffffff" }
+  - match: { _source.h3.15: "8f754e64992d6d8" }
+
+  - do:
+      get:
+        index: test
+        id: 2
+  - match: { _source.h3.0: "8075fffffffffff" }
+  - match: { _source.h3.15: "8f754e64992d6d8" }
